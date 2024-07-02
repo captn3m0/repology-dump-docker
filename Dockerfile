@@ -16,7 +16,7 @@ RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_l
 	echo "host    all             all             0.0.0.0/0            trust" >> /var/lib/pgsql/data/pg_hba.conf && \
 	curl --silent https://dumps.repology.org/repology-database-dump-latest.sql.zst | zstd -d | \
 	psql --dbname repology -v ON_ERROR_STOP=1 && \
-	pg_ctl --wait --mode immediate -D /var/lib/pgsql/data STOP
+	pg_ctl --wait --mode immediate -D /var/lib/pgsql/data stop
 
 CMD postgres -c "listen_addresses=*" -D /var/lib/pgsql/data
 EXPOSE 5432
