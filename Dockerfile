@@ -4,7 +4,6 @@ RUN zypper --non-interactive install postgresql14 postgresql14-libversion postgr
 RUN mkdir -p /var/run/postgresql && chown -R postgres /var/run/postgresql
 
 USER postgres
-ADD repology-database-dump-latest.sql.zst /tmp/repology-database-dump-latest.sql.zst
 RUN /usr/lib/postgresql14/bin/initdb -D /var/lib/pgsql/data
 ENV PGDATA=/var/lib/pgsql/data
 RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_level=minimal' -c 'max_wal_senders=0' -c 'max_replication_slots=0'" && \
@@ -21,4 +20,4 @@ RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_l
 
 CMD postgres -c "listen_addresses=*" -D /var/lib/pgsql/data
 EXPOSE 5432
-HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD pg_isreadyz
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD pg_isready
