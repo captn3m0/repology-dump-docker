@@ -9,13 +9,13 @@ ENV PGDATA=/var/lib/pgsql/data
 RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_level=minimal' -c 'max_wal_senders=0' -c 'max_replication_slots=0'" && \
 	psql -c "CREATE DATABASE repology" && \
 	psql -c "CREATE USER repology WITH PASSWORD 'repology'" && \
-	psql -c "GRANT ALL ON DATABASE repology TO repology" && \
-	psql --dbname repology -c "GRANT CREATE ON SCHEMA public TO PUBLIC" && \
 	psql --dbname repology -c "CREATE EXTENSION pg_trgm" && \
 	psql --dbname repology -c "CREATE EXTENSION libversion" && \
 	echo "host    all             all             0.0.0.0/0            trust" >> /var/lib/pgsql/data/pg_hba.conf && \
 	curl --silent https://dumps.repology.org/repology-database-dump-latest.sql.zst | zstd -d | \
 	psql --dbname repology -v ON_ERROR_STOP=1 && \
+        psql --dbname repology -c "GRANT CREATE ON SCHEMA public TO PUBLIC" && \
+ 	psql -c "GRANT ALL ON DATABASE repology TO repology" && \
 	pg_ctl --wait --mode immediate -D /var/lib/pgsql/data stop
 
 CMD postgres -c "listen_addresses=*" -D /var/lib/pgsql/data
