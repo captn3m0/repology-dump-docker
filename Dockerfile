@@ -8,7 +8,7 @@ RUN /usr/lib/postgresql14/bin/initdb --encoding=UTF8 -D /var/lib/pgsql/data
 ENV PGDATA=/var/lib/pgsql/data
 
 # do not use "RUN curl ..." as this would be executed once and the layer would be cached
-ADD --chown=postgres:users https://dumps.repology.org/repology-database-dump-latest.sql.zst /tmp/
+ADD --chown=postgres:postgres https://dumps.repology.org/repology-database-dump-latest.sql.zst /tmp/
 
 RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_level=minimal' -c 'max_wal_senders=0' -c 'max_replication_slots=0'" && \
 	psql -c "CREATE DATABASE repology encoding='UTF8'" && \
