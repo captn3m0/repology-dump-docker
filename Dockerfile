@@ -16,7 +16,7 @@ RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_l
 	psql --dbname repology -c "CREATE EXTENSION pg_trgm" && \
 	psql --dbname repology -c "CREATE EXTENSION libversion" && \
 	echo "host    all             all             0.0.0.0/0            trust" >> /var/lib/pgsql/data/pg_hba.conf && \
-	zstd -d /tmp/repology-database-dump-latest.sql.zst | psql --dbname repology -v ON_ERROR_STOP=1 && \
+	zstd -dc /tmp/repology-database-dump-latest.sql.zst | psql --dbname repology -v ON_ERROR_STOP=1 && \
         psql --dbname repology -c "GRANT CREATE ON SCHEMA public TO PUBLIC" && \
  	psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO repology" && \
 	pg_ctl --wait --mode immediate -D /var/lib/pgsql/data stop && \
