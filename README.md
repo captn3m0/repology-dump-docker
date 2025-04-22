@@ -13,3 +13,6 @@ per https://github.com/repology/repology-webapp/issues/65.
 ## How to Use
 
 TODO
+
+
+<!-- dummy update to have a commit newer than 60 days. Otherwise the scheduled workflows are disabled. -->
