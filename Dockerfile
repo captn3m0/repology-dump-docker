@@ -1,10 +1,10 @@
-FROM opensuse/leap:15.6
+FROM opensuse/tumbleweed:latest
 
-RUN zypper --non-interactive install postgresql16 postgresql16-libversion postgresql16-contrib zstd
+RUN zypper --non-interactive install postgresql17 postgresql17-libversion postgresql17-contrib zstd
 RUN mkdir -p /var/run/postgresql && chown -R postgres /var/run/postgresql
 
 USER postgres
-RUN /usr/lib/postgresql16/bin/initdb --encoding=UTF8 -D /var/lib/pgsql/data
+RUN /usr/lib/postgresql17/bin/initdb --encoding=UTF8 -D /var/lib/pgsql/data
 ENV PGDATA=/var/lib/pgsql/data
 
 # do not use "RUN curl ..." as this would be executed once and the layer would be cached
