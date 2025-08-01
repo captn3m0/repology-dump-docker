@@ -3,6 +3,9 @@ name: Daily Build
 on:
   schedule:
     - cron: "54 16 * * *"
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
