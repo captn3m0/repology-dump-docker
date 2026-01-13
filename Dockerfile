@@ -19,9 +19,11 @@ RUN pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_l
 	zstd -dc /tmp/repology-database-dump-latest.sql.zst | psql --dbname repology -v ON_ERROR_STOP=1 && \
         psql --dbname repology -c "GRANT CREATE, USAGE ON SCHEMA repology TO repology" && \
  	psql --dbname repology -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA repology TO repology" && \
-	pg_ctl --wait --mode immediate -D /var/lib/pgsql/data stop && \
+	pg_ctl --wait --mode fast -D /var/lib/pgsql/data stop && \
         rm /tmp/repology-database-dump-latest.sql.zst
 
 CMD postgres -c "listen_addresses=*" -D /var/lib/pgsql/data
 EXPOSE 5432
-HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD pg_isready
+
+# takes a long time to start: 4 CPUs, 8G RAM --> 370s
+HEALTHCHECK --interval=10s --timeout=3s --start-period=480s --retries=3 CMD pg_isready
