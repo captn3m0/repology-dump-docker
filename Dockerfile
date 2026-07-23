@@ -10,6 +10,11 @@ USER postgres
 RUN /usr/lib/postgresql17/bin/initdb --encoding=UTF8 -D /var/lib/pgsql/data
 ENV PGDATA=/var/lib/pgsql/data
 
+# The dump creates all objects in a "repology" schema with fully-qualified
+# names and search_path='', so they cannot be redirected at load time. Rather
+# than physically moving every object into "public", set the database default
+# search_path so repology-rs's unqualified queries resolve to the repology
+# schema; "public" stays in the path for the pg_trgm/libversion extensions.
 # Bind Mount saves us disk usage
 RUN --mount=type=bind,from=dump,source=/repology-database-dump-latest.sql.zst,target=/tmp/repology-database-dump-latest.sql.zst \
 	pg_ctl --wait --mode immediate -D /var/lib/pgsql/data start -o "-F -c 'wal_level=minimal' -c 'max_wal_senders=0' -c 'max_replication_slots=0'" && \
@@ -19,6 +24,7 @@ RUN --mount=type=bind,from=dump,source=/repology-database-dump-latest.sql.zst,ta
 	psql --dbname repology -c "CREATE EXTENSION libversion" && \
 	echo "host    all             all             0.0.0.0/0            trust" >> /var/lib/pgsql/data/pg_hba.conf && \
 	zstd -dc /tmp/repology-database-dump-latest.sql.zst | psql --dbname repology -v ON_ERROR_STOP=1 && \
+	psql --dbname repology -c "ALTER DATABASE repology SET search_path TO repology, public" && \
 	psql --dbname repology -c "GRANT CREATE, USAGE ON SCHEMA repology TO repology" && \
 	psql --dbname repology -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA repology TO repology" && \
 	pg_ctl --wait --mode fast -D /var/lib/pgsql/data stop
